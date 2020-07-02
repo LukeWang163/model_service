@@ -11,6 +11,7 @@ import traceback
 
 from fastapi import FastAPI, Request, Response
 
+from model_service import *
 import python_model_service as python_model_service
 from error_code import PY0101, PY0105
 import log
@@ -32,36 +33,44 @@ def init(model):
         return Response(content='\n', status_code=status, media_type='application/json')
 
     @app.post("/")
-    def predict_model(request: Request):
+    async def predict_model(request: Request):
         if request.method == 'POST':
             try:
-                request_data = request.body()
-                json_data = json.loads(request_data, object_pairs_hook=collections.OrderedDict)
+                json_data = await request.body()
             except:
                 logger.error('Request data must be in json format!')
                 logger.error(traceback.format_exc())
-                return get_result_json(PY0101(), traceback.format_exc()), 500, {'Content-Type': 'application/json'}
+                return Response(content=get_result_json(PY0101(), traceback.format_exc()),
+                                status_code=500,
+                                media_type='application/json')
             try:
                 res_data = model_service.inference(json_data)
+                try:
+                    json.loads(res_data)
+                except ValueError:
+                    res_data = predictions_to_json(res_data)
                 logger.info("Get inference data and response success!")
-                res_data = {"resp_data": res_data}
-                if "meta" in json_data:
-                    res_result = {"meta": json_data["meta"], "data": res_data}
-                else:
-                    res_result = {"data": res_data}
-                return json.dumps(res_result), 200, {'Content-Type': 'application/json'}
+                return Response(content=json.dumps(res_data),
+                                status_code=200,
+                                media_type='application/json')
             except KeyError:
                 logger.error('Predict failed!')
                 logger.error(traceback.format_exc())
-                return get_result_json(PY0105(), traceback.format_exc()), 400, {'Content-Type': 'application/json'}
+                return Response(content=get_result_json(PY0105(), traceback.format_exc()),
+                                status_code=400,
+                                media_type='application/json')
             except TypeError:
                 logger.error('Predict failed!')
                 logger.error(traceback.format_exc())
-                return get_result_json(PY0105(), traceback.format_exc()), 400, {'Content-Type': 'application/json'}
+                return Response(content=get_result_json(PY0105(), traceback.format_exc()),
+                                status_code=400,
+                                media_type='application/json')
             except Exception:
                 logger.error('Predict failed!')
                 logger.error(traceback.format_exc())
-                return get_result_json(PY0105(), traceback.format_exc()), 500, {'Content-Type': 'application/json'}
+                return Response(get_result_json(PY0105(), traceback.format_exc()),
+                                status_code=500,
+                                media_type='application/json')
 
     return app
 
@@ -116,4 +125,4 @@ else:
     model_service = class_defs[0](model_path)
     logger.info("Begin to start web server...")
 
-    init(model_path)
+    app = init(model_path)
