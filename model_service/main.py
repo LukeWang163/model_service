@@ -85,18 +85,18 @@ def get_result_json(ais_error, error_info):
 
 
 parser = argparse.ArgumentParser(description='Inference task')
-parser.add_argument('--file_path', help='the directory in which all user files are locate')
-parser.add_argument('--model_path', help='model file path')
+# parser.add_argument('--file_path', help='the directory in which all user files are locate')
+# parser.add_argument('--model_path', help='model file path')
 
 if __name__ == '__main__':
-    args = parser.parse_args()
+    # args = parser.parse_args()
+    print("main")
 else:
-    args = parser.parse_args(os.environ['PY_MODEL_ARGS'].split())
+    # args = parser.parse_args(os.environ['PY_MODEL_ARGS'].split())
 
-    file_path = args.file_path
-    model_path = args.model_path
-    json_file = file_path + "/config.json"
-    user_script = file_path + "/customize_service.py"
+    file_path = "/app"
+    model_path = file_path + "/" + "model.m"
+    user_script = file_path + "/custom_service.py"
     sys.path.append(file_path)
 
     if not os.path.exists(model_path):

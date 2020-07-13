@@ -21,7 +21,11 @@ class SklearnServingBaseService(SingleNodeService):
 
     def __init__(self, model_path):
         self.model_path = model_path
-        self.model = load_model(model_path)
+        self.model = self._load_model()
+
+    def _load_model(self):
+        model = load_model(self.model_path)
+        return model
 
     def _read_data(self, data):
         logger.info("Parsing data from user input")

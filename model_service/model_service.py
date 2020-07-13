@@ -39,6 +39,10 @@ class SingleNodeService(ModelService):
         return result_data
 
     @abstractmethod
+    def _load_model(self):
+        return None
+
+    @abstractmethod
     def _read_data(self, data):
         return data
 
