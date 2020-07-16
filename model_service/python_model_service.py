@@ -42,7 +42,7 @@ class SklearnServingBaseService(SingleNodeService):
 
     def _postprocess(self, data):
         logger.info("Process inference result")
-        result = predictions_to_json(data)
+        result = predictions_to_jsonable(data)
         return result
 
 

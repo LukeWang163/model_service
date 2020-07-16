@@ -1,13 +1,17 @@
 # -*- coding: utf-8 -*-
 
 import argparse
-import collections
 import imp
 import inspect
 import json
 import os
 import sys
 import traceback
+import warnings
+
+with warnings.catch_warnings():
+    warnings.filterwarnings("ignore", category=FutureWarning)
+    warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 from fastapi import FastAPI, Request, Response
 
@@ -41,35 +45,33 @@ def init(model):
                 logger.error('Request data must be in json format!')
                 logger.error(traceback.format_exc())
                 return Response(content=get_result_json(PY0101(), traceback.format_exc()),
-                                status_code=500,
+                                status_code=200,
                                 media_type='application/json')
             try:
                 res_data = model_service.inference(json_data)
-                try:
-                    json.loads(res_data)
-                except ValueError:
-                    res_data = predictions_to_json(res_data)
                 logger.info("Get inference data and response success!")
-                return Response(content=json.dumps(res_data),
+
+                result = {"result": res_data, "success": True, "errorLog": ""}
+                return Response(content=json.dumps(result, cls=NumpyEncoder),
                                 status_code=200,
                                 media_type='application/json')
             except KeyError:
                 logger.error('Predict failed!')
                 logger.error(traceback.format_exc())
                 return Response(content=get_result_json(PY0105(), traceback.format_exc()),
-                                status_code=400,
+                                status_code=200,
                                 media_type='application/json')
             except TypeError:
                 logger.error('Predict failed!')
                 logger.error(traceback.format_exc())
                 return Response(content=get_result_json(PY0105(), traceback.format_exc()),
-                                status_code=400,
+                                status_code=200,
                                 media_type='application/json')
             except Exception:
                 logger.error('Predict failed!')
                 logger.error(traceback.format_exc())
                 return Response(get_result_json(PY0105(), traceback.format_exc()),
-                                status_code=500,
+                                status_code=200,
                                 media_type='application/json')
 
     return app
@@ -80,7 +82,9 @@ def get_result_json(ais_error, error_info):
         Create a json response with error code and error message
     """
     error_data = ais_error.to_dict()
-    error_data['error_info'] = error_info
+    error_data['success'] = False
+    error_data['result'] = ''
+    error_data['errorLog'] = error_info
     return json.dumps(error_data, ensure_ascii=False)
 
 

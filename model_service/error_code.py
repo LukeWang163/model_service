@@ -8,10 +8,10 @@ import log
 logger = log.getLogger(__name__)
 
 
-class ModelArtsError(Exception):
-    """Base class for AIS exceptions"""
-    code_key = 'erno'
-    msg_key = 'msg'
+class IMLPError(Exception):
+    """Base class for IMLP exceptions"""
+    code_key = 'errorCode'
+    msg_key = 'errorMsg'
     code = NotImplemented
     msg = NotImplemented
 
@@ -24,22 +24,19 @@ class ModelArtsError(Exception):
         return 'ModelArtsError: (%s, %s)' % (self.code, self.msg)
 
 
-class PY0100(ModelArtsError):
-    """Specific ModelArts error"""
-    code = 'PY.0100'
+class PY0200(IMLPError):
+    code = 'PY.0200'
     msg = 'Succeeded'
 
 
-class PY0101(ModelArtsError):
-    """Specific ModelArts error"""
+class PY0101(IMLPError):
     code = 'PY.0101'
     msg = 'Input data is invalid'
 
 
-class PY0105(ModelArtsError):
-    """Specific ModelArts error"""
+class PY0105(IMLPError):
     code = 'PY.0105'
     msg = 'Inference failed'
 
 
-__all__ = ['ModelArtsError', 'PY0100', 'PY0101', 'PY0105']
+__all__ = ['IMLPError', 'PY0200', 'PY0101', 'PY0105']

@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import argparse
 import collections
-import imp
 import inspect
 import json
 import os
@@ -53,12 +52,13 @@ async def predict_model(request: Request):
             # model_service = python_model_service.SklearnServingBaseService("/Users/petra/Workspace/mnist/xgboost.m")
             model_service = python_model_service.SklearnServingBaseService("E:\\KDD99\\logistic.m")
             res_data = model_service.inference(request_data)
-            try:
-                json.loads(res_data)
-            except ValueError:
-                res_data = predictions_to_json(res_data)
+            # try:
+            #     json.loads(res_data)
+            # except ValueError:
+            #     res_data = predictions_to_json(res_data)
             logger.info("Get inference data and response success!")
-            return Response(content=res_data,
+            result = {"result": res_data, "success": True, "errorLog": ""}
+            return Response(content=json.dumps(result, cls=NumpyEncoder),
                             status_code=200,
                             media_type='application/json')
         except KeyError:
@@ -80,6 +80,15 @@ async def predict_model(request: Request):
                             status_code=500,
                             media_type='application/json')
 
+def get_result_json(ais_error, error_info):
+    """
+        Create a json response with error code and error message
+    """
+    error_data = ais_error.to_dict()
+    error_data['success'] = False
+    error_data['result'] = ''
+    error_data['errorLog'] = error_info
+    return json.dumps(error_data, ensure_ascii=False)
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)

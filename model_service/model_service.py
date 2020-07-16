@@ -59,9 +59,9 @@ class SingleNodeService(ModelService):
         return data
 
 
-def predictions_to_json(raw_predictions):
+def predictions_to_jsonable(raw_predictions):
     predictions = _get_jsonable_obj(raw_predictions, pandas_orient="records")
-    return json.dumps(predictions, cls=NumpyEncoder)
+    return predictions # json.dumps(predictions, cls=NumpyEncoder)
 
 
 def _get_jsonable_obj(data, pandas_orient="records"):
