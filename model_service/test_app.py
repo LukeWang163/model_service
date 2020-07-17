@@ -50,7 +50,7 @@ async def predict_model(request: Request):
             return get_result_json(PY0101(), traceback.format_exc()), 500, {'Content-Type': 'application/json'}
         try:
             # model_service = python_model_service.SklearnServingBaseService("/Users/petra/Workspace/mnist/xgboost.m")
-            model_service = python_model_service.SklearnServingBaseService("E:\\KDD99\\logistic.m")
+            model_service = python_model_service.SklearnServingBaseService("E:\\KDD99\\xgboost.m")
             res_data = model_service.inference(request_data)
             # try:
             #     json.loads(res_data)

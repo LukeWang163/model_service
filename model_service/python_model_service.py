@@ -63,12 +63,12 @@ def load_model(model_path):
 
 def predict(model, data):
     try:
-        pre_result = model.predict(data)
+        pre_result = model.predict(data.values)
         pre_result = pre_result.tolist()
         return pre_result
     except:
         try:
-            pre_data = xgb.DMatrix(data)
+            pre_data = xgb.DMatrix(data.values)
             pre_result = model.predict(pre_data)
             pre_result = pre_result.tolist()
         except:
