@@ -13,6 +13,7 @@ import base64
 from json import JSONEncoder
 import numpy as np
 from model_service import *
+from fastapi.exceptions import RequestValidationError
 import python_model_service as python_model_service
 from error_code import PY0101, PY0105
 import log
@@ -22,7 +23,23 @@ except ImportError:
     from io import StringIO
 
 logger = log.getLogger(__name__)
-app = FastAPI()
+
+
+async def not_found(request, exc):
+    return Response(content="Requested Resource Not Found", status_code=404)
+
+
+async def server_error(request, exc):
+    return Response(content="Internal Error", status_code=500)
+
+
+exception_handlers = {
+    404: not_found,
+    500: server_error
+}
+
+
+app = FastAPI(exception_handlers=exception_handlers)
 
 
 @app.get('/ping')
@@ -36,7 +53,7 @@ def ping():  # pylint: disable=unused-variable
     return Response(content='ok', status_code=200, media_type='application/json')
 
 
-@app.post("/")
+@app.post("/abc")
 async def predict_model(request: Request):
     if request.method == 'POST':
         try:
@@ -49,8 +66,8 @@ async def predict_model(request: Request):
             logger.error(traceback.format_exc())
             return get_result_json(PY0101(), traceback.format_exc()), 500, {'Content-Type': 'application/json'}
         try:
-            # model_service = python_model_service.SklearnServingBaseService("/Users/petra/Workspace/mnist/xgboost.m")
-            model_service = python_model_service.SklearnServingBaseService("E:\\KDD99\\xgboost.m")
+            model_service = python_model_service.SklearnServingBaseService("/Users/petra/Workspace/data/xgboost.m")
+            # model_service = python_model_service.SklearnServingBaseService("E:\\KDD99\\xgboost.m")
             res_data = model_service.inference(request_data)
             # try:
             #     json.loads(res_data)
