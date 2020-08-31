@@ -15,7 +15,7 @@ with warnings.catch_warnings():
 
 from fastapi import FastAPI, Request, Response
 
-from model_service import *
+from model_service import NumpyEncoder
 import python_model_service as python_model_service
 from error_code import PY0101, PY0105
 import log

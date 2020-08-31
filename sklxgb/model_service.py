@@ -2,7 +2,6 @@
 from abc import ABCMeta, abstractmethod
 
 import log
-import json
 import base64
 from json import JSONEncoder
 import numpy as np

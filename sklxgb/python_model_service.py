@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import traceback
-from model_service import *
+from model_service import SingleNodeService, predictions_to_jsonable
 import log
 import pandas as pd
 import xgboost as xgb
